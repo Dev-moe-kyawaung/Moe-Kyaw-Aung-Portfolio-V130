@@ -1,0 +1,63 @@
+name: ✅ HTML Validation & Quality
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday 08:00 UTC
+
+jobs:
+  validate:
+    name: 🔍 Validate HTML & File Health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 📋 File Stats
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📄 Portfolio V130 — File Health Check"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Lines : $(wc -l < index.html)"
+          echo "Size  : $(du -sh index.html | cut -f1)"
+          echo "SHA256: $(sha256sum index.html | cut -d' ' -f1)"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+      - name: ✅ HTML Structure Checks
+        run: |
+          grep -q '<!DOCTYPE html>'     index.html && echo "✅ DOCTYPE" || echo "❌ DOCTYPE missing"
+          grep -q 'charset="UTF-8"'     index.html && echo "✅ UTF-8 charset" || echo "⚠️  charset"
+          grep -q 'name="viewport"'     index.html && echo "✅ Viewport meta" || echo "⚠️  viewport"
+          grep -q '<title>'             index.html && echo "✅ Title tag" || echo "❌ Title missing"
+          grep -q 'og:title'            index.html && echo "✅ OG title" || echo "⚠️  OG tags"
+          grep -q 'application/ld+json' index.html && echo "✅ JSON-LD schema" || echo "⚠️  JSON-LD"
+          grep -q 'serviceWorker'       index.html && echo "✅ Service Worker" || echo "⚠️  SW"
+          grep -q 'bootstrap@5'         index.html && echo "✅ Bootstrap 5" || echo "❌ Bootstrap"
+          grep -q 'font-awesome'        index.html && echo "✅ Font Awesome" || echo "❌ FontAwesome"
+          grep -q '</body>'             index.html && echo "✅ </body>" || echo "❌ </body>"
+          grep -q '</html>'             index.html && echo "✅ </html>" || echo "❌ </html>"
+
+      - name: 📏 Size Check
+        run: |
+          SIZE=$(stat -c%s index.html)
+          SIZE_KB=$((SIZE / 1024))
+          echo "File size: ${SIZE_KB}KB"
+          if [ $SIZE_KB -gt 600 ]; then
+            echo "⚠️  Warning: Over 600KB — consider optimization"
+          else
+            echo "✅ Size is acceptable (${SIZE_KB}KB)"
+          fi
+
+      - name: 🔒 Security Checks
+        run: |
+          # Warn if any script src uses http:// (not https://)
+          HTTP_SCRIPTS=$(grep -c 'src="http://' index.html 2>/dev/null || true)
+          [ "$HTTP_SCRIPTS" -eq 0 ] && echo "✅ No insecure http:// scripts" || echo "⚠️  $HTTP_SCRIPTS insecure script src(s)"
+
+          # Warn if window.location used (potential open redirect)
+          LOC=$(grep -c 'window\.location\s*=' index.html 2>/dev/null || true)
+          [ "$LOC" -eq 0 ] && echo "✅ No location assignment" || echo "ℹ️  $LOC window.location assignment(s)"
+
+          echo "✅ Security scan complete"

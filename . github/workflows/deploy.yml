@@ -1,0 +1,80 @@
+name: 🚀 Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: 🔍 Validate Portfolio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ✅ Check index.html exists
+        run: |
+          [ -f index.html ] && echo "✅ index.html found" || (echo "❌ index.html missing" && exit 1)
+          echo "📊 Lines  : $(wc -l < index.html)"
+          echo "📦 Size   : $(du -sh index.html | cut -f1)"
+
+      - name: 🔎 Verify critical sections
+        run: |
+          SECTIONS=(
+            'id="hero"' 'id="about"' 'id="skills"' 'id="apps"'
+            'id="github-accounts"' 'id="lovable"' 'id="certificates"'
+            'id="burmese"' 'id="features"' 'id="testimonials"'
+            'id="pricing"' 'id="faq"' 'id="gallery"' 'id="contact"'
+            'id="newsletter"' 'id="blog"' 'id="easter-egg"'
+            'bootstrap@5' 'font-awesome' 'serviceWorker'
+            'application/ld+json' 'id="themeBtn"' 'id="cursor-dot"'
+          )
+          FAIL=0
+          for pat in "${SECTIONS[@]}"; do
+            if grep -q "$pat" index.html; then
+              echo "✅ $pat"
+            else
+              echo "❌ MISSING: $pat"
+              FAIL=$((FAIL+1))
+            fi
+          done
+          [ $FAIL -eq 0 ] && echo "🎉 All sections present!" || (echo "❌ $FAIL missing" && exit 1)
+
+  build:
+    name: 🏗️ Build
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+  deploy:
+    name: 🚀 Deploy
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: 🎉 Success
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Portfolio V130 LIVE at: ${{ steps.deploy.outputs.page_url }}"
+          echo "👤 Moe Kyaw Aung — github.com/Dev-moe-kyawaung"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
