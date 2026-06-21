@@ -1,0 +1,120 @@
+# ─────────────────────────────────────────────────────────────
+# Moe Kyaw Aung Portfolio V130 — .gitignore
+# github.com/Dev-moe-kyawaung
+# ─────────────────────────────────────────────────────────────
+
+# ── OS Generated ──────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ── Editors & IDEs ────────────────────────────────────────────
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# ── Node / npm (if tooling ever added) ───────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+.npmrc
+.nvmrc
+
+# ── Build Outputs ─────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+*.min.html
+*.min.js
+*.min.css
+
+# ── Environment & Secrets — NEVER commit ─────────────────────
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+*.cert
+secrets.json
+config.local.js
+firebase.json.local
+
+# ── Temporary / Cache ─────────────────────────────────────────
+.cache/
+.temp/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.bak
+*.backup
+*.old
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log
+yarn-debug.log
+
+# ── Testing & Coverage ────────────────────────────────────────
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# ── Python (if scripts added) ─────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.egg-info/
+.venv/
+venv/
+env/
+.env/
+
+# ── Archives ──────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z
+*.dmg
+
+# ── Lighthouse Reports ────────────────────────────────────────
+lighthouse-*.json
+lighthouse-*.html
+lhreport/
+
+# ── Misc ──────────────────────────────────────────────────────
+.local
+.history/
+.vercel
+.netlify
